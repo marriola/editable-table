@@ -1,0 +1,16 @@
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, system, sans-serif;
+}
+
+th {
+    background-color: #aaa;
+}
+
+tr:nth-child(even) {
+    background-color: #ccc;
+}
+
+tr:nth-child(odd) {
+    background-color: #ddd;
+}
