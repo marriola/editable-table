@@ -12,6 +12,7 @@ export default class EditableColumn extends React.Component {
 	return (<td>
 	    <input id="new-row"
 		   type="text"
+		   className="edit-row"
 		   value={ this.props.source }
 		   onChange={ this.props.change }
 		   onKeyUp={ this.props.keyUp }
