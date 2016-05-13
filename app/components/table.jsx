@@ -5,6 +5,12 @@ import { randomKey } from "utils";
 
 /**
  * An editable table component
+ *
+ * The component's state consists of:
+ *
+ * source        A copy of the table decorated with metadata
+ * addingNew     True when the last row is a new row in edit
+ *               mode, false otherwise
  */
 export class Table extends React.Component {
     constructor(props) {
@@ -13,89 +19,116 @@ export class Table extends React.Component {
 	this.state = {
 	    source: this.props.source.map(row => ({
 		key: randomKey(),
-		columns: row
+		mode: RowMode.View,
+		columns: row,
+		newColumns: []
 	    })),
-	    
+
 	    addingNew: false
 	};
     }
 
-    
+
     /**
-     * 
+     * Extracts the columns from the decorated table and passes
+     * the new table to the parent component.
      */
-    saveRows() {
-	this.props.saveRows(this.state.source.map(row => row.columns));
+    updateParent(newTable) {
+	this.props.saveRows(newTable.map(row => row.columns));
+    }
+    
+
+    /**
+     * Sets a row's mode
+     *
+     * This method looks stupid, but row is bound to the source
+     * row before being passed to an EditableRow component
+     */
+    setMode(row, mode) {
+	row.mode = mode;
     }
 
     
     /**
-     * Creates a blank row and puts it in edit mode
+     * Creates a blank row in edit mode at the end of the table
      */
-    addNew() {
+    addRow() {
 	let count = this.state.source[0].columns.length;
 	let newColumns = Array.apply(null, Array(count))
 			      .map(x => "");
 
 	let newRow = {
-	    key: null,
+	    key: randomKey(),
+	    isNewRow: true,
 	    mode: RowMode.Edit,
 	    columns: newColumns
 	};
 	
-	let newSource = this.state.source
+	let newTable = this.state.source
 			    .slice()
 			    .concat([newRow]);
 	
 	this.setState({
-	    source: newSource,
+	    source: newTable,
 	    addingNew: true
 	});
     }
 
+    
     /**
-     * Removes the last row when cancelling a new row
+     * Removes a row from the table by key
      */
-    removeLast() {
+    removeRow(key) {
 	this.setState({
-	    source: this.state.source.slice(0, -1),
+	    source: this.state.source.filter(row => row.key !== key),
 	    addingNew: false
 	});
     }
 
+    
     /**
-     * Saves the new row to the data table
+     * Updates a row by key
      */
-    saveNew(newColumns) {
-	let newRow = {
-	    key: randomKey(),
-	    columns: newColumns
-	};
+    updateRow(key, newRow) {
+	let newTable = this.state.source.slice();
 	
-	let newSource = this.state.source
-			    .slice(0, -1)
-			    .concat([newRow]);
+	for (let row of newTable) {
+	    if (row.key === key) {
+		row.isNewRow = false;
+		row.columns = newRow.slice();
+		break;
+	    }
+	}
 
 	this.setState({
-	    source: newSource,
+	    source: newTable,
 	    addingNew: false
 	});
-	this.saveRows();
+
+	this.updateParent(newTable);
     }
 
+    
     render() {
 	let headers = this.props.headers
 			  .map(col => (<th>{ col }</th>))
-			  .concat([<th />]);
+			  .concat([<th />]);	
 
-	let rows = this.state.source.map(row =>
-	    (<EditableRow source={ row }
-		       removeLast={ this.removeLast.bind(this) }
-		       saveNew={ this.saveNew.bind(this) }
-	     />));
+	let rows = this.state.source.map((row, i) => {
+	    return (<EditableRow source={ row }
+			  updateRow={ this.updateRow.bind(this, row.key) }
+			  removeRow={ this.removeRow.bind(this, row.key) }
+			  setMode={ this.setMode.bind(this, row) }
+		    />)
+	});
 	
 	return (
 	    <div>
+		<button onClick={ this.addRow.bind(this) }
+			disabled={ this.state.addingNew }>
+		    Add New
+		</button>
+
 		<table>
 		    <thead>
 			<tr>{ headers }</tr>
@@ -105,8 +138,6 @@ export class Table extends React.Component {
 			{ rows }
 		    </tbody>
 		</table>
-
-		<button onClick={ this.addNew.bind(this) } disabled={ this.state.addingNew }>Add New</button>
 	    </div>
 	);
     }

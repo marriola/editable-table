@@ -5,6 +5,9 @@ import { RowMode } from "components/table-common";
 
 /**
  * A table row which can be switched between view and edit modes.
+ *
+ * The component keeps a copy of its row separate from the table. Changes are made to that row as the user
+ * makes changes to it. 
  */
 export default class EditableRow extends React.Component {
     constructor(props) {
@@ -14,17 +17,14 @@ export default class EditableRow extends React.Component {
 	//
 	// mode          RowMode.View or RowMode.Edit
 	// columns       The column values in this row
-	// newColumns    In view mode, this is an identical copy of columns.
+	// newRow    In view mode, this is an identical copy of columns.
 	//               In edit mode, it contains the values in the EditableColumns.
 	// columnsView   columns mapped to a list of <td> elements
 	
 	this.state = {
-	    mode: this.props.source.mode || RowMode.View,
-	    columns: this.props.source.columns,
-	    newColumns: this.props.source.columns.slice()
+	    newRow: this.props.source.columns.slice(),
+	    mode: RowMode.View
 	};
-
-    	this.state.columnsView = this.mapColumns(RowMode.View);
     }
 
     
@@ -52,9 +52,9 @@ export default class EditableRow extends React.Component {
      * Receives a change event from an EditableColumn
      */
     change(index, e) {
-	let newColumns = this.state.newColumns.slice();
-	newColumns[index] = e.target.value;
-	this.setState({ newColumns });
+	let newRow = this.state.newRow.slice();
+	newRow[index] = e.target.value;
+	this.setState({ newRow });
     }
     
     
@@ -67,7 +67,7 @@ export default class EditableRow extends React.Component {
      * Maps the row's column values to table columns
      */
     mapColumns(mode) {
-	return this.state.newColumns.map((val, i) => {
+	return this.state.newRow.map((val, i) => {
 	    let col;
 	    if (mode === RowMode.View) {
 		col = (<td>{ val }</td>);
@@ -88,10 +88,11 @@ export default class EditableRow extends React.Component {
      * Sets the mode of this table row
      */
     setMode(mode) {
-	this.setState({
-	    mode,
-	    columnsView: this.mapColumns(mode)
-	});
+	this.props.setMode(mode);
+
+	// The view mode, which we just set through and inherit from the parent,
+	// has changed, so we have to re-render our cells
+	this.forceUpdate();
     }
 
     
@@ -111,14 +112,10 @@ export default class EditableRow extends React.Component {
      * Saves the modified column values and sets view mode
      */
     save() {
-	if (!this.props.source.key) {
-	    debugger;
-	    this.props.saveNew(this.state.newColumns);
-	}
-	
+	this.props.updateRow(this.state.newRow);	
 	this.setMode(RowMode.View);
 	this.setState({
-	    columns: this.state.newColumns.slice()
+	    columns: this.state.newRow.slice()
 	});
     }
 
@@ -128,11 +125,11 @@ export default class EditableRow extends React.Component {
     cancel() {
 	this.setMode(RowMode.View);
 	this.setState({
-	    newColumns: this.state.columns.slice()
+	    newRow: this.props.source.columns.slice()
 	});
 
-	if (!this.props.source.key) {
-	    this.props.removeLast();
+	if (this.props.source.isNewRow) {
+	    this.props.removeRow();
 	}
     }
 
@@ -141,10 +138,10 @@ export default class EditableRow extends React.Component {
 
     
     render() {
-	return (<tr id={ this.props.source.key }>
-	    { this.mapColumns(this.state.mode) }
+	return (<tr>
+	    { this.mapColumns(this.props.source.mode) }
 	    
-	    <EditCommand mode={ this.state.mode }
+	    <EditCommand mode={ this.props.source.mode }
 			 edit={ this.edit.bind(this) }
 			 save={ this.save.bind(this) }
 	    />
