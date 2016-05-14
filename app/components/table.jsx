@@ -78,10 +78,14 @@ export class Table extends React.Component {
      * Removes a row from the table by key
      */
     removeRow(key) {
+	let newSource = this.state.source.filter(row => row.key !== key);
+	
 	this.setState({
-	    source: this.state.source.filter(row => row.key !== key),
+	    source: newSource,
 	    addingNew: false
 	});
+	
+	this.updateParent(newSource);
     }
 
     
@@ -109,7 +113,6 @@ export class Table extends React.Component {
 
     
     render() {
-	debugger;
 	let headers = this.props.headers
 			  .map(col => (<th>{ col }</th>))
 			  .concat([<th />, <th />]);	

@@ -6,6 +6,25 @@ import React from "react";
 export default class EditableColumn extends React.Component {
     constructor(props) {
 	super(props);
+
+	this.state = {
+	    newRow: this.props.source.slice()
+	};
+    }
+
+    change(e) {
+	this.setState({
+	    newRow: e.target.value
+	});
+	this.props.change(e);
+    }
+
+    update() {
+	this.props.change(this.state.newRow);
+    }
+
+    keyUp(e) {
+	this.props.keyUp(e);
     }
 
     render() {
@@ -13,9 +32,9 @@ export default class EditableColumn extends React.Component {
 	    <input id="new-row"
 		   type="text"
 		   className="edit-row"
-		   value={ this.props.source }
-		   onChange={ this.props.change }
-		   onKeyUp={ this.props.keyUp }
+		   value={ this.state.newRow }
+		   onChange={ this.change.bind(this) }
+		   onKeyUp={ this.keyUp.bind(this) }
 	    />
 	</td>);
     }

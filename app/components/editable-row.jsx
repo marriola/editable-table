@@ -57,7 +57,7 @@ export default class EditableRow extends React.Component {
 	newRow[index] = e.target.value;
 	this.setState({ newRow });
     }
-    
+
     
     ////////////////////////////////////////////////////////////////////////////
     // Helper methods
@@ -68,7 +68,9 @@ export default class EditableRow extends React.Component {
      * Maps the row's column values to table columns
      */
     mapColumns(mode) {
-	return this.state.newRow.map((val, i) => {
+	let source = this.state.mode === RowMode.View ? this.props.source.columns : this.state.newRow;
+	
+	return source.map((val, i) => {
 	    let col;
 	    if (mode === RowMode.View) {
 		col = (<td>{ val }</td>);
@@ -106,6 +108,9 @@ export default class EditableRow extends React.Component {
      * Sets edit mode
      */
     edit() {
+	this.setState({
+	    newRow: this.props.source.columns.slice()
+	});
 	this.setMode(RowMode.Edit);
     }
 
@@ -139,7 +144,6 @@ export default class EditableRow extends React.Component {
 
     
     render() {
-	debugger;
 	return (<tr>
 	    { this.mapColumns(this.props.source.mode) }
 	    
