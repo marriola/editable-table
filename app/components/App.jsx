@@ -31,9 +31,10 @@ export default class App extends React.Component {
     render() {
 	return (
 	    <div id="content">
-		<button onClick={ this.dumpTable.bind(this) }>
+		<button id="btnDump" onClick={ this.dumpTable.bind(this) }>
 		    Dump Table
 		</button>
+		<div id="popDumpTable">Open your console</div>
 
 		<Table source={ this.state.table }
 		       headers={ this.state.headers }

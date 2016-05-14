@@ -23,3 +23,45 @@ tr:nth-child(odd) {
     border: none;
     background-color: transparent;
 }
+
+#popDumpTable {
+    opacity: 0;
+    display: inline-block;
+    transition: opacity linear 100ms;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin-left: 10px;
+    padding: 5px;
+}
+
+#popDumpTable:after,
+#popDumpTable:before {
+    right: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+#popDumpTable:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-right-color: #fff;
+    border-width: 19px;
+    bottom: 70%;
+    margin-bottom: -19px;
+}
+
+#popDumpTable:before {
+    border-color: rgba(0, 0, 0, 0);
+    border-right-color: #000;
+    border-width: 20px;
+    bottom: 70%;
+    margin-left: -20px;
+}
+
+#btnDump:hover + #popDumpTable {
+    opacity: 1;
+}

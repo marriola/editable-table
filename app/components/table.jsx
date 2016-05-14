@@ -1,7 +1,6 @@
 import React from "react";
 import { RowMode } from "components/table-common";
 import EditableRow from "components/editable-row";
-import { randomKey } from "utils";
 
 /**
  * An editable table component
@@ -18,7 +17,7 @@ export class Table extends React.Component {
 
 	this.state = {
 	    source: this.props.source.map(row => ({
-		key: randomKey(),
+		key: Table.nextKey(),
 		mode: RowMode.View,
 		columns: row,
 		newColumns: []
@@ -58,7 +57,7 @@ export class Table extends React.Component {
 			      .map(x => "");
 
 	let newRow = {
-	    key: randomKey(),
+	    key: Table.nextKey(),
 	    isNewRow: true,
 	    mode: RowMode.Edit,
 	    columns: newColumns
@@ -110,15 +109,16 @@ export class Table extends React.Component {
 
     
     render() {
+	debugger;
 	let headers = this.props.headers
 			  .map(col => (<th>{ col }</th>))
-			  .concat([<th />]);	
+			  .concat([<th />, <th />]);	
 
 	let rows = this.state.source.map((row, i) => {
 	    return (<EditableRow source={ row }
-			  updateRow={ this.updateRow.bind(this, row.key) }
-			  removeRow={ this.removeRow.bind(this, row.key) }
-			  setMode={ this.setMode.bind(this, row) }
+				 updateRow={ this.updateRow.bind(this, row.key) }
+				 removeRow={ this.removeRow.bind(this, row.key) }
+				 setMode={ this.setMode.bind(this, row) }
 		    />)
 	});
 	
@@ -141,4 +141,12 @@ export class Table extends React.Component {
 	    </div>
 	);
     }
+}
+
+Table.lastKey = 0;
+
+Table.nextKey = function () {
+    let key = Table.lastKey.toString(16);
+    Table.lastKey++;
+    return key;
 }

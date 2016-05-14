@@ -1,6 +1,7 @@
 import React from "react";
 import EditableColumn from "components/editable-column";
 import EditCommand from "components/edit-command";
+import DeleteCommand from "components/delete-command";
 import { RowMode } from "components/table-common";
 
 /**
@@ -138,6 +139,7 @@ export default class EditableRow extends React.Component {
 
     
     render() {
+	debugger;
 	return (<tr>
 	    { this.mapColumns(this.props.source.mode) }
 	    
@@ -145,6 +147,8 @@ export default class EditableRow extends React.Component {
 			 edit={ this.edit.bind(this) }
 			 save={ this.save.bind(this) }
 	    />
+
+	    <DeleteCommand removeRow={ this.props.removeRow } />
 	</tr>);
     }
 }
