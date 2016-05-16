@@ -19,14 +19,6 @@ export default class EditableColumn extends React.Component {
 	this.props.change(e);
     }
 
-    update() {
-	this.props.change(this.state.newRow);
-    }
-
-    keyUp(e) {
-	this.props.keyUp(e);
-    }
-
     render() {
 	return (<td>
 	    <input id="new-row"
@@ -34,7 +26,7 @@ export default class EditableColumn extends React.Component {
 		   className="edit-row"
 		   value={ this.state.newRow }
 		   onChange={ this.change.bind(this) }
-		   onKeyUp={ this.keyUp.bind(this) }
+		   onKeyUp={ this.props.keyUp }
 	    />
 	</td>);
     }

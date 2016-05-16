@@ -65,3 +65,44 @@ tr:nth-child(odd) {
 #btnDump:hover + #popDumpTable {
     opacity: 1;
 }
+
+.grab {
+    display: block;
+    padding: 3px;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    cursor: pointer;
+
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.right-wedge {
+    width: 0;
+    height: 0;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid black;
+}
+
+.grab:active {
+    background-color: #222;
+}
+
+.grab:active .right-wedge {
+    border-left: 6px solid #ddd;
+}
+
+.highlight-top {
+    border-top: 2px solid #5aa;
+}
+
+.highlight-bottom {
+    border-bottom: 2px solid #5aa;
+}

@@ -68,7 +68,9 @@ export default class EditableRow extends React.Component {
      * Maps the row's column values to table columns
      */
     mapColumns(mode) {
-	let source = this.state.mode === RowMode.View ? this.props.source.columns : this.state.newRow;
+	let source = this.state.mode === RowMode.View ?
+		     this.props.source.columns :
+		     this.state.newRow;
 	
 	return source.map((val, i) => {
 	    let col;
@@ -144,7 +146,13 @@ export default class EditableRow extends React.Component {
 
     
     render() {
-	return (<tr>
+	return (<tr draggable="true">
+	    <td>
+		<a className="grab">
+		    <div className="right-wedge"></div>
+		</a>
+	    </td>
+
 	    { this.mapColumns(this.props.source.mode) }
 	    
 	    <EditCommand mode={ this.props.source.mode }
